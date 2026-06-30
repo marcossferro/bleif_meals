@@ -61,6 +61,10 @@ function duplicarWorkbookYLimpiar() {
   traspasarValores(ssOriginal, ssCopia);
 
   ui.alert('Listo. Copia creada: "' + nuevoNombre + '" en la carpeta "' + carpetaDestino.getName() + '".\nLink: ' + copia.getUrl());
+
+  SpreadsheetApp.flush();
+
+  createNewFormulas();
 }
 
 // Calcula el "próximo mes" a partir del nombre del archivo ORIGINAL
@@ -250,3 +254,27 @@ function columnaPorIndice(indice) {
   }
   return col;
 }
+
+function createNewFormulas(){
+  var ventas = SpreadsheetApp.openById(archivoOriginalId).getSheetByName("Ventas");
+  var produccion = SpreadsheetApp.openById(archivoOriginalId).getSheetByName("Produccion");
+
+  // Ventas
+  ventas.getRange('C3:C').setFormula(`=IF(B3="","",H3+K3+I3+J3)`);
+  ventas.getRange('D3:D').setFormula(`=IF($B3="","",IF(F3="Regalo",0,
+(ROUND(IF(H3>20,VLOOKUP(TRIM(MID(H$2,4,99)),AUXILIAR!$E:$F,2,0)/1.25,IF(AND(H3>=5,H3<=20),VLOOKUP(TRIM(MID(H$2,4,99)),AUXILIAR!$E:$F,2,0)/1.1111,VLOOKUP(TRIM(MID(H$2,4,99)),AUXILIAR!$E:$F,2,0))),0) * H3)+
+(ROUND(IF(I3>20,VLOOKUP(TRIM(MID(I$2,4,99)),AUXILIAR!$E:$F,2,0)/1.25,IF(AND(I3>=5,I3<=20),VLOOKUP(TRIM(MID(I$2,4,99)),AUXILIAR!$E:$F,2,0)/1.1111,VLOOKUP(TRIM(MID(I$2,4,99)),AUXILIAR!$E:$F,2,0))),0) * I3)+
+(ROUND(IF(J3>20,VLOOKUP(TRIM(MID(J$2,4,99)),AUXILIAR!$E:$F,2,0)/1.25,IF(AND(J3>=5,J3<=20),VLOOKUP(TRIM(MID(J$2,4,99)),AUXILIAR!$E:$F,2,0)/1.1111,VLOOKUP(TRIM(MID(J$2,4,99)),AUXILIAR!$E:$F,2,0))),0) * J3)+
+(ROUND(IF(K3>20,VLOOKUP(TRIM(MID(K$2,4,99)),AUXILIAR!$E:$F,2,0)/1.25+200,IF(AND(K3>=5,K3<=20),VLOOKUP(TRIM(MID(K$2,4,99)),AUXILIAR!$E:$F,2,0)/1.1111+100,VLOOKUP(TRIM(MID(K$2,4,99)),AUXILIAR!$E:$F,2,0)))+200,0) * K3)) + E3)`);
+  ventas.getRange('H3:H').setFormula(`=IF($B3="","",L3+O3+R3+U3+X3+AA3+AD3+AG3+AJ3+AM3+AP3+AS3+AV3+AY3+BB3+BE3+BH3+BK3+BN3+BQ3+BX3)`);
+  ventas.getRange('I3:I').setFormula(`=IF($B3="","",M3+P3+S3+V3+Y3+AB3+AE3+AH3+AK3+AN3+AQ3+AT3+AW3+AZ3+BC3+BF3+BI3+BL3+BO3+BR3+BY3)`);
+  ventas.getRange('J3:J').setFormula(`=IF($B3="","",N3+Q3+T3+W3+Z3+AC3+AF3+AI3+AL3+AO3+AR3+AU3+AX3+BA3+BD3+BG3+BJ3+BM3+BP3+BS3+BZ3)`);
+  ventas.getRange('K3:K').setFormula(`=IF($B3="","",BT3+BU3+BV3+BW3)`);
+
+  // Produccion
+  produccion.getRange('C8:C13').setFormula(`=(VLOOKUP(TRIM(MID(H$2,4,99)),AUXILIAR!$E:$F,2,0)*H8)+(VLOOKUP(TRIM(MID(I$2,4,99)),AUXILIAR!$E:$F,2,0)*I8)+(VLOOKUP(TRIM(MID(J$2,4,99)),AUXILIAR!$E:$F,2,0)*J8)+(VLOOKUP(TRIM(MID(K$2,4,99)),AUXILIAR!$E:$F,2,0)*K8)`);
+  produccion.getRange('D9:D13').setFormula(`=SUMIFS(Ventas!$D$3:$D,Ventas!$A$3:$A,TRIM(MID(A9,LEN("Produccion "),99)))`);
+
+}
+
+
